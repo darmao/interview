@@ -1,0 +1,233 @@
+//常见的手撕代码：
+struct BTreeNode
+{
+    char data;
+    BTreeNode *left;
+    BTreeNode *right;
+};
+//创建二叉树
+void createBTree(BTreeNode*&T)
+{
+    char c;
+    cin>>c;
+    if(c=='#')
+    {
+        T= nullptr;
+    }else
+    {
+        T=new BTreeNode;
+        T->data=c;
+        createBTree(T->left);
+        createBTree(T->right);
+    }
+}
+//前序递归遍历
+void preTraverse(BTreeNode *T)
+{
+    if(T)
+    {
+        cout<<T->data;
+        preTraverse(T->left);
+        preTraverse(T->right);
+    }
+
+
+}
+//中序递归遍历
+void midTraverse(BTreeNode *T)
+{
+    if(T)
+    {
+        midTraverse(T->left);
+        cout<<T->data;
+        midTraverse(T->right);
+    }
+}
+//后续递归遍历
+void lastTraverse(BTreeNode *T)
+{
+    if(T)
+    {
+        lastTraverse(T->left);
+        lastTraverse(T->right);
+        cout<<T->data;
+    }
+}
+//中序非递归遍历
+void midTrace(BTreeNode *T)
+{
+    if(T== nullptr)return;
+    BTreeNode *p=T;
+    stack<BTreeNode*>s;
+    while(!s.empty()||p)
+    {
+        while(p)
+        {
+            s.push(p);
+            p=p->left;
+        }
+
+        if(!s.empty())
+        {
+            p=s.top();
+            cout<<setw(4)<<p->data;
+            s.pop();
+            p=p->right;
+        }
+    }
+
+}
+//前序非递归遍历
+void preTrace(BTreeNode *T)
+{
+    if(T== nullptr)return;
+    BTreeNode *p=T;
+    stack<BTreeNode*>s;
+    while(!s.empty()||p)
+    {
+        while(p)
+        {
+            cout<<setw(4)<<p->data;
+            s.push(p);
+            p=p->left;
+        }
+
+        if(!s.empty())
+        {
+            p=s.top();
+            s.pop();
+            p=p->right;
+        }
+    }
+}
+//后续非递归遍历
+void lastTrace(BTreeNode *T)
+{
+    if(T== nullptr)return;
+    stack<BTreeNode*>s;
+    BTreeNode *pCur=T;
+    BTreeNode *lastVisit;
+    while(pCur)
+    {
+        s.push(pCur);
+        pCur=pCur->left;
+    }
+    //此时p已经指左子树下边
+    while(!s.empty())
+    {
+        pCur=s.top();
+        s.pop();
+        if(pCur->right== nullptr||pCur->right==lastVisit)
+        {
+            cout<<setw(4)<<pCur->data;
+            lastVisit=pCur;
+        }else
+        {
+            s.push(pCur);
+            pCur=pCur->right;
+            while(pCur)
+            {
+                s.push(pCur);
+                pCur=pCur->left;
+            }
+        }
+    }
+}
+//层先遍历
+void layerTrace(BTreeNode *T)
+{
+    if(T== nullptr)return;
+    BTreeNode *p=T;
+    queue<BTreeNode*>q;
+    q.push(p);
+    while(!q.empty())
+    {
+        p=q.front();
+        q.pop();
+        cout<<setw(4)<<p->data;
+        if(p->left!= nullptr)q.push(p->left);
+        if(p->right!= nullptr)q.push(p->right);
+
+    }
+}
+//二叉树的序列化
+void decode(TreeNode *pRoot)//二叉树的序列化
+{
+    if(pRoot== nullptr)return;
+    stack<TreeNode*>stack1;
+    TreeNode *p=pRoot;
+    vector<int>vec;
+    while(p||!stack1.empty())
+    {
+        while(p)
+        {
+            vec.push_back(p->val);
+            stack1.push(p);
+            p=p->left;
+        }
+        vec.push_back(-1);//空指针节点用-1表示
+        if(!stack1.empty())
+        {
+            p=stack1.top();
+            stack1.pop();
+            p=p->right;
+        }
+    }
+    vec.push_back(-1);
+    for(auto i:vec)cout<<i<<" ";
+    cout<<endl;
+}
+//堆排和快排
+void quickSort(vector<int>&s,int l,int r)
+{
+    if(l<r)
+    {
+        int low=l;
+        int high=r;
+        int pivot=s[low];
+        while(low<high)
+        {
+            while(low<high&&s[high]>=pivot)--high;
+            if(low<high)s[low++]=s[high];
+            while(low<high&&s[low]<pivot)++low;
+            if(low<high)s[high--]=s[low];
+        }
+        s[low]=pivot;
+        quickSort(s,l,low-1);
+        quickSort(s,low+1,r);
+    }
+}
+
+void buidHeap(vector<int>&nums,int lastIndex)
+{
+    for(int i=(lastIndex-1)/2;i>=0;--i)
+    {
+        int k=i;
+        while(k*2+1<=lastIndex)
+        {
+            int biggerIndex=2*k+1;
+            if(biggerIndex<lastIndex)
+            {
+                if(nums[biggerIndex]<nums[biggerIndex+1])
+                    biggerIndex+=1;
+            }
+            if(nums[k]<nums[biggerIndex])
+            {
+                swap(nums[k],nums[biggerIndex]);
+                k=biggerIndex;
+            }else
+            {
+                break;
+            }
+        }
+    }
+}
+void heapSort(vector<int>&nums)
+{
+    int length=nums.size();
+    for(int i=0;i<length-1;++i)
+    {
+        buidHeap(nums,length-1-i);
+        swap(nums[0],length-1-i);
+    }
+}
